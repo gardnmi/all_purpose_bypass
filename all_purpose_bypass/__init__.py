@@ -142,13 +142,16 @@ class Bypass:
         # prevent a loop in the job
         try:
             dbutils.widgets.get("type")
-            self.job_running = False
-        except:
             self.job_running = True
+        except:
+            if spark.conf.get("spark.databricks.clusterSource") == "JOB":
+                self.job_running = True
+            else:
+                self.job_running = False
 
     def create_job(self):
 
-        if self.job_running:
+        if not self.job_running:
 
             existing_job = {}
             response = requests.get(
